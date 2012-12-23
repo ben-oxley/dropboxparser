@@ -66,7 +66,7 @@ if not lastmodified.rstrip('\n') == repr(timestamp):
 			if float(lastmodified) < time.mktime(s.updated_parsed):
 				try:
 					description_string = strip_tags(unicode(s.description).encode("utf-8"))
-					f_events.write(str(time.mktime(s.updated_parsed)) + "," + description_string + "\n")
+					f_events.write(str(time.mktime(s.updated_parsed)) + "," + description_string)
 				except IOError  as errormsg:
 					#print unicode(s.updated_parsed).encode("utf-8") + "," + unicode(s.updated).encode("utf-8") + "," + unicode(s.description).encode("utf-8") + "\n"
 					f_events.write(unicode(s.updated).encode("utf-8") + "," + unicode(s.description).encode("utf-8") + "\n")
