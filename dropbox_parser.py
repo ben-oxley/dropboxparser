@@ -4,7 +4,23 @@ import sys
 import feedparser
 import socket
 import time
+from HTMLParser import HTMLParser
 from datetime import date
+
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
 
 try:
 	with open('events.txt','a') as f:
@@ -48,10 +64,18 @@ if not lastmodified.rstrip('\n') == repr(timestamp):
 	for s in d.entries:
 		#if not "You" in unicode(s.description).encode("utf-8"):
 			if float(lastmodified) < time.mktime(s.updated_parsed):
-				#print unicode(s.updated_parsed).encode("utf-8") + "," + unicode(s.updated).encode("utf-8") + "," + unicode(s.description).encode("utf-8") + "\n"
-				f_events.write(unicode(s.updated).encode("utf-8") + "," + unicode(s.description).encode("utf-8") + "\n")
+				try:
+					description_string = strip_tags(unicode(s.description).encode("utf-8"))
+					f_events.write(str(time.mktime(s.updated_parsed)) + "," + description_string + "\n")
+				except IOError  as errormsg:
+					#print unicode(s.updated_parsed).encode("utf-8") + "," + unicode(s.updated).encode("utf-8") + "," + unicode(s.description).encode("utf-8") + "\n"
+					f_events.write(unicode(s.updated).encode("utf-8") + "," + unicode(s.description).encode("utf-8") + "\n")
 	
 #maxentries = len(d.entries)
 #print maxentries
 f_events.close()
 f_update.close()
+
+
+
+
